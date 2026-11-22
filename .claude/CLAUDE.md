@@ -127,7 +127,7 @@ their saved .rds results are in inst/benchmark/; the report reads
 simulation_results.rds via system.file(), so reinstall after re-running it.
 
 ## Key dates
-- Submission: Monday Nov 2, 2026, 11:59 PM Eastern (PDF report + repo link on
+- Submission: extended by Dr. Lee to Nov 23, 2026 (originally Mon Nov 2, 11:59 PM Eastern) (PDF report + repo link on
   Canvas, Pages URL in the comment). The repo is graded as of the last commit
   before the deadline.
 - Oral walkthrough: Nov 2-6, 10-15 minutes; book the slot before Nov 2.

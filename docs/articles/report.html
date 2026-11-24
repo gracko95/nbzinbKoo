@@ -71,21 +71,12 @@
 
   <p class="author">Grace Koo</p>
 
-  <p class="date">2026-10-23</p>
+  <p class="date">2026-11-23</p>
 
 
 </div>
 
 <main>
-<!--
-Writing guide (delete this comment before submitting):
-- Every number in the text should come from inline R code: a backtick, the
-  letter r, a space, the expression, and a closing backtick.
-- Sections marked TODO need YOUR own words: the interpretation (Section 6),
-  the discussion (Section 7) and the AI-use statement (Section 8).
-- Render: quarto render vignettes/articles/report.qmd --to pdf
-  then:   mv vignettes/articles/report.pdf report/report.pdf
--->
 <section id="introduction" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
 <p>Counts such as the number of doctor visits are often <strong>overdispersed</strong>: their variance is larger than their mean, which the Poisson model does not allow. They often also contain <strong>more zeros</strong> than a Poisson (or even a negative binomial) distribution predicts. The negative binomial (NB2) model handles overdispersion through a dispersion parameter <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>. The zero-inflated negative binomial (ZINB) model also allows a separate process that produces “structural” zeros.</p>
@@ -216,8 +207,8 @@ Table&nbsp;1: Maximum absolute differences from the reference implementations, i
 <td style="text-align: right;">6.7e-08</td>
 <td style="text-align: right;">4.5e-13</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">0.015</td>
-<td style="text-align: right;">0.018</td>
+<td style="text-align: right;">0.010</td>
+<td style="text-align: right;">0.011</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">NB, NMES1988</td>
@@ -226,8 +217,8 @@ Table&nbsp;1: Maximum absolute differences from the reference implementations, i
 <td style="text-align: right;">4.3e-08</td>
 <td style="text-align: right;">7.1e-11</td>
 <td style="text-align: right;">3</td>
-<td style="text-align: right;">0.076</td>
-<td style="text-align: right;">0.064</td>
+<td style="text-align: right;">0.049</td>
+<td style="text-align: right;">0.042</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">ZINB, bioChemists</td>
@@ -236,8 +227,8 @@ Table&nbsp;1: Maximum absolute differences from the reference implementations, i
 <td style="text-align: right;">1.3e-05</td>
 <td style="text-align: right;">-4.2e-08</td>
 <td style="text-align: right;">111</td>
-<td style="text-align: right;">1.076</td>
-<td style="text-align: right;">0.042</td>
+<td style="text-align: right;">0.708</td>
+<td style="text-align: right;">0.028</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">ZINB, NMES1988</td>
@@ -246,8 +237,8 @@ Table&nbsp;1: Maximum absolute differences from the reference implementations, i
 <td style="text-align: right;">4.4e-06</td>
 <td style="text-align: right;">-1.6e-08</td>
 <td style="text-align: right;">53</td>
-<td style="text-align: right;">3.023</td>
-<td style="text-align: right;">0.196</td>
+<td style="text-align: right;">1.989</td>
+<td style="text-align: right;">0.127</td>
 </tr>
 </tbody>
 </table>
@@ -483,7 +474,7 @@ Table&nbsp;3: Simulation results: bias, mean estimated SE versus Monte Carlo SD 
 </figure>
 </div>
 </div>
-<p>TODO (your words): comment on the bias (is it small relative to the SE?), whether the mean SE matches the Monte Carlo SD (are the analytic SEs right?), and whether coverage is close to 0.95 given the Monte Carlo error <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mrow><mn>0.95</mn><mo>⋅</mo><mn>0.05</mn><mi>/</mi><mi>R</mi></mrow></msqrt><mo>≈</mo><mn>0.015</mn></mrow><annotation encoding="application/x-tex">\sqrt{0.95 \cdot 0.05 / R} \approx 0.015</annotation></semantics></math>.</p>
+<p>Based on the results of the simulation, we can see that the bias is much smaller (about a less than a fifth) relative to the SE. The mean SEs are very close to the Monte Carlo SDs. For the coverage rate, all six values fall within 0.95 ± 2 × 0.015, which is roughly 0.92–0.98. So, the deviations are what you’d expect from just 200 replications. Thus, the simulation demonstrates that our function zinbreg() recovers the true parameters pretty closely and the analytic standard errors can be trusted.</p>
 </section>
 <section id="data-analysis-physician-office-visits-nmes1988" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Data analysis: physician office visits (NMES1988)</h1>
@@ -670,21 +661,32 @@ Table&nbsp;6: ZINB zero part: odds ratios (OR) of being a structural zero (a per
 </div>
 </div>
 <p>The NB model estimates <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo>=</mo><mn>1.21</mn></mrow><annotation encoding="application/x-tex">\hat\theta = 1.21</annotation></semantics></math> (SE 0.034), and the ZINB model <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo>=</mo><mn>1.48</mn></mrow><annotation encoding="application/x-tex">\hat\theta = 1.48</annotation></semantics></math>.</p>
-<p>TODO (your words; this is graded on interpretation, do not copy Appendix A):</p>
-<ol type="1">
-<li>What the descriptive summary and <a href="#tbl-compare" class="quarto-xref">Table&nbsp;4</a> say about overdispersion and excess zeros (compare the expected zeros of the NB model with the 683 observed).</li>
-<li>Interpret the main IRRs in plain language (e.g.&nbsp;“each additional chronic condition multiplies the expected number of visits by …”).</li>
-<li>Interpret the zero-part ORs: which covariates change the odds of being a person who would never visit a physician, and in which direction?</li>
-<li>Which model you prefer (AIC vs BIC, expected zeros, interpretability) and why.</li>
-</ol>
+<p>The NMES1988 dataset has a variance of 45.7, which is about eight times the mean, which is 5.77. Thus, we can notice that there is an overdispersion problem. The ZINB and NB model actually takes into account the overdispersion problem this dataset has, which is why both of them perform much better compared to the Poisson model. We can actually see that the Poisson model expects much less zeros, because it assumes equal mean and variance. The ZINB model takes into account the excess zero problem, which can be evidently seen in <a href="#fig-visits" class="quarto-xref">Figure&nbsp;1</a>. Thus, the expected zeros for the ZINB model is the closest to the number of zeros the data actually contains (708.9 vs 683) Based on the <a href="#tbl-compare" class="quarto-xref">Table&nbsp;4</a>, we can see that the ZINB model has a lower AIC and BIC and favor the ZINB model over the NB one, so they are in agreement.</p>
+<p>Looking at <a href="#tbl-irr" class="quarto-xref">Table&nbsp;5</a>, we can see the incidence rate ratios with 95% Wald confidence intervals. These results describe people who do visit a physician, holding the other covariates fixed (count part). We can see that the strongest effects for increased physicians visits are hospital stays, health status, and chronic conditions. The weaker effects are insurance status, gender, and school. For the NB model, holding other variables fixed:</p>
+<ul>
+<li><p>hospital: each additional hospital stay multiplies the expected number of physician office visits by 1.24, or a 24% increase, with 95% confidence that the factor is between 1.20 and 1.29.</p></li>
+<li><p>healthpoor: individuals with poor health are expected to visit the physician office by a factor of 1.36, or 36% more than individuals with average health, with a 95% confidence that the factor is between 1.23 and 1.49.</p></li>
+<li><p>healthexcellent: individuals with excellent health are expected to visit the physician office by a factor of 0.71, or 29% less than individuals with average health, with a 95% confidence that the factor is between 0.63 and 0.80.</p></li>
+<li><p>chronic: each additional chronic condition multiplies the expected number of physician office visits by 1.19, or a 19% increase, with a 95% confidence that the factor is between 1.16 and 1.22.</p></li>
+<li><p>gendermale: men are expected to visit the physician office by a factor of 0.88, or 12% less compared to women, with a 95% confidence that the factor is between 0.83 and 0.94.</p></li>
+<li><p>school: each additional year of education multiplies the expected number of physician office visits by 1.03, or a 3% increase, with a 95% confidence that the factor is between 1.02 and 1.04.</p></li>
+<li><p>insuranceyes: individuals with private insurance are expected to visit the physician office by a factor of 1.25, or 25% more than individuals without private insurance, with a 95% confidence that the factor is between 1.16 and 1.35.</p></li>
+</ul>
+<p>We can see that compared to the ZINB count IRR, most of the covariate point estimates of the IRR and the 95% CIs are very similar for all of the variables with all the directions of the variables being in agreement. But, the insurance and chronic variable have smaller point estimates compared to NB, because ZINB moves a part of their effect into the zero part.</p>
+<p>In this dataset’s context, odds ratio means the odds of someone who would never visit a physician’s office, which is a structural zero. Looking at <a href="#tbl-or" class="quarto-xref">Table&nbsp;6</a>, we can see that the odds ratios for chronic, gendermale, school, and insuranceyes are significant because they have a p-value less than 0.05 and the CI doesn’t include 1. All of these covariates except for gendermale have lower odds of being in the group with a lower number of physician office visits because the odds ratio is less than 1. Gendermale has an odds ratio over 1, meaning that it has a higher odds being in the group with a lower number of visits to the physician office visits compared to females.</p>
+<p>Based on the two tables, <a href="#tbl-irr" class="quarto-xref">Table&nbsp;5</a> and <a href="#tbl-or" class="quarto-xref">Table&nbsp;6</a>, it is interesting to also note that for chronic and private insurance, among people who visit the physician’s office, each additional coniditon or having private insurance means more visits, and for people that don’t visit a physician, both make them less likely to not have ever visited the physician’s office. But, the opposite is true for gendermale, in that men are more likely to have never visited the physician’s office compared to females. However, among those who visit the physicians office, men are less likely to make fewer visits than women.</p>
+<p>Overall, I would prefer the ZINB model because it has the lowest AIC and BIC compared to the Poisson and NB models and it fits the zeros the best. ZINB model is also able to handle both pieces of information - whether people see a physician at all and how often they go.</p>
 </section>
 <section id="discussion" class="level1" data-number="7">
 <h1 data-number="7"><span class="header-section-number">7</span> Discussion</h1>
-<p>TODO (your words): limitations and extensions. Ideas to consider: EM is slower than BFGS (<a href="#tbl-agree" class="quarto-xref">Table&nbsp;1</a>) and could be accelerated (e.g.&nbsp;a final few Newton steps on the full likelihood, or SQUAREM); the NB standard errors treat <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math> as known, as <code>glm.nb()</code> does; only the count part accepts an offset; other links for the zero part, zero-inflated Poisson or hurdle models, and robust (sandwich) standard errors are natural extensions.</p>
+<p>The nbzinbKoo R package is able to successfully implement the negative binomial and zero-inflated negative binomial regression from scratch. Comparing NB to <code>glm.nb()</code>, the differences are about <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mi>−</mi><mn>8</mn></mrow></msup><annotation encoding="application/x-tex">10^{-8}</annotation></semantics></math> or smaller, well inside the <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mi>−</mi><mn>5</mn></mrow></msup><annotation encoding="application/x-tex">10^{-5}</annotation></semantics></math> requirement. Comparing ZINB to <code>zeroinfl()</code>, the largest coefficient difference is <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.5</mn><mo>×</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>4</mn></mrow></msup></mrow><annotation encoding="application/x-tex">1.5 \times 10^{-4}</annotation></semantics></math> on bioChemists, well inside the <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mi>−</mi><mn>3</mn></mrow></msup><annotation encoding="application/x-tex">10^{-3}</annotation></semantics></math> requirement. Across 200 simulated datasets, parameter estimates show small biases, with the largest absolute bias approximately 0.05 for the zero-part intercept. Mean estimated standard errors are close to the Monte Carlo standard deviations, and empirical coverage of the 95% confidence intervals ranges from 0.930 to 0.965. These findings support the implementation’s accuracy under the conditions examined.</p>
+<p>There are several limitations to address for this package. First, using the EM algorithm slows down the calculation time compared to the pscl package’s <code>zeroinfl()</code>. For example, in ZINB on bioChemists, the nbzinbKoo package takes 0.71 seconds vs.&nbsp;0.03 seconds for <code>zeroinfl()</code>. Additionally, for the NMES1988 dataset, it takes 1.99 seconds vs.&nbsp;0.13 seconds for <code>zeroinfl()</code> (<a href="#tbl-agree" class="quarto-xref">Table&nbsp;1</a>). Each maximization step itself is an iterative procedure, and EM converges linearly, which is why it takes longer. One possible extension is to use EM for the initial iterations and then switch to Newton–Raphson updates on the full observed-data log-likelihood. In addition, convergence does not guarantee that the global maximum has been found. Comparing fits from multiple starting values would provide a stronger assessment of optimization reliability.</p>
+<p>Another limitation is that the simulation scope is limited to one design: <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>500</mn></mrow><annotation encoding="application/x-tex">n = 500</annotation></semantics></math>, one set of true values, and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi><mo>=</mo><mn>1.5</mn></mrow><annotation encoding="application/x-tex">\theta = 1.5</annotation></semantics></math>. Cases such as small n, very large <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math> (close to Poisson) and heavy zero inflation were not tested. Future simulations could vary these conditions to assess estimation accuracy, interval coverage, and convergence more broadly.</p>
+<p>Finally, the package provides model-based standard errors but does not implement robust sandwich standard errors. Its uncertainty estimates therefore depend on the assumed model being appropriate. Adding robust covariance estimation would help address some forms of model misspecification, although it would not correct misspecification of the conditional mean.</p>
 </section>
 <section id="ai-use-statement" class="level1" data-number="8">
 <h1 data-number="8"><span class="header-section-number">8</span> AI-use statement</h1>
-<p>TODO (your words): describe how you used Claude Code (what you asked it to do), what you verified yourself (e.g.&nbsp;comparing the IRLS weights, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>τ</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\tau_i</annotation></semantics></math> and the <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math> score with Section 3, running the tests, the prohibited-function grep), and one concrete example of output you corrected or rejected.</p>
+<p>AI Statement is included in a separate pdf file in the Canvas submission.</p>
 </section>
 <section id="references" class="level1" data-number="9">
 <h1 data-number="9"><span class="header-section-number">9</span> References</h1>

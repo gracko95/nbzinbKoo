@@ -36,16 +36,6 @@ writeLines(unlist(lapply(sort(ls(ns, all.names = TRUE)), function(f) deparse(get
 pkg_code_hash <- unname(tools::md5sum(code_file))
 ```
 
-<!--
-Writing guide (delete this comment before submitting):
-- Every number in the text should come from inline R code: a backtick, the
-  letter r, a space, the expression, and a closing backtick.
-- Sections marked TODO need YOUR own words: the interpretation (Section 6),
-  the discussion (Section 7) and the AI-use statement (Section 8).
-- Render: quarto render vignettes/articles/report.qmd --to pdf
-  then:   mv vignettes/articles/report.pdf report/report.pdf
--->
-
 # Introduction
 
 Counts such as the number of doctor visits are often **overdispersed**:
@@ -409,11 +399,11 @@ Overall, I would prefer the ZINB model because it has the lowest AIC and BIC com
 
 # Discussion
 
-The nbzinbKoo R package is able to successfully implement the negative binomial and zero inflated negative binomial regression from scratch. Comparing NB to the glm.nb(), the differences are about 1e-8 or smaller, well inside the  1e-5 requirement. Comparing ZINB to zeroinfl(), the largest coefficient difference is 1.5e-4 on bioChemists, well inside the 1e-3 requirement. Across 200 simulated datasets, parameter estimates show small biases, with the largest absolute bias approximately 0.05 for the zero-part intercept. Mean estimated standard errors are close to the Monte Carlo standard deviations, and empirical coverage of the 95% confidence intervals ranges from 0.930 to 0.965. These findings support the implementation’s accuracy under the conditions examined.
+The nbzinbKoo R package is able to successfully implement the negative binomial and zero-inflated negative binomial regression from scratch. Comparing NB to `glm.nb()`, the differences are about $10^{-8}$ or smaller, well inside the $10^{-5}$ requirement. Comparing ZINB to `zeroinfl()`, the largest coefficient difference is $1.5 \times 10^{-4}$ on bioChemists, well inside the $10^{-3}$ requirement. Across 200 simulated datasets, parameter estimates show small biases, with the largest absolute bias approximately 0.05 for the zero-part intercept. Mean estimated standard errors are close to the Monte Carlo standard deviations, and empirical coverage of the 95% confidence intervals ranges from 0.930 to 0.965. These findings support the implementation’s accuracy under the conditions examined.
 
-There are several limitations to address for this package. First, using the EM algorithm slows down the calculation time compared to the zeroinfl package. For example, in ZINB on bioChemists, the nbzinbKoo package is 1.07 seconds vs. 0.04 seconds on zeroinfl(). Additionally, for the NMES1988 dataset, 3 seconds vs. 0.19 seconds. Each maximization step itself is an iterative procedure, and EM converges linearly, which is why it takes longer. One possible extension is to use EM for the initial iterations and then switch to Newton Raphson updates on the full observed-data log-likelihood. In addition, convergence does not guarantee that the global maximum has been found. Comparing fits from multiple starting values would provide a stronger assessment of optimization reliability.
+There are several limitations to address for this package. First, using the EM algorithm slows down the calculation time compared to the pscl package's `zeroinfl()`. For example, in ZINB on bioChemists, the nbzinbKoo package takes `r sprintf("%.2f", dd["ZINB, bioChemists", "time_mine"])` seconds vs. `r sprintf("%.2f", dd["ZINB, bioChemists", "time_ref"])` seconds for `zeroinfl()`. Additionally, for the NMES1988 dataset, it takes `r sprintf("%.2f", dd["ZINB, NMES1988", "time_mine"])` seconds vs. `r sprintf("%.2f", dd["ZINB, NMES1988", "time_ref"])` seconds for `zeroinfl()` (@tbl-agree). Each maximization step itself is an iterative procedure, and EM converges linearly, which is why it takes longer. One possible extension is to use EM for the initial iterations and then switch to Newton–Raphson updates on the full observed-data log-likelihood. In addition, convergence does not guarantee that the global maximum has been found. Comparing fits from multiple starting values would provide a stronger assessment of optimization reliability.
 
-Another limitation is that the simulation scope is limited to one design, n=500, one set of true values, theta = 1.5. Cases such as small n, very large theta (close to Poisson) and heavy zero inflation were not tested. Future simulations could vary these conditions to assess estimation accuracy, interval coverage, and convergence more broadly.
+Another limitation is that the simulation scope is limited to one design: $n = 500$, one set of true values, and $\theta = 1.5$. Cases such as small n, very large $\theta$ (close to Poisson) and heavy zero inflation were not tested. Future simulations could vary these conditions to assess estimation accuracy, interval coverage, and convergence more broadly.
 
 Finally, the package provides model-based standard errors but does not implement robust sandwich standard errors. Its uncertainty estimates therefore depend on the assumed model being appropriate. Adding robust covariance estimation would help address some forms of model misspecification, although it would not correct misspecification of the conditional mean.
 

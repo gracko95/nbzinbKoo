@@ -167,10 +167,10 @@ higher maximum.
 
 | Fit               |    Coef |      SE |   theta |   logLik | Iter | Time (ours) | Time (ref.) |
 |:------------------|--------:|--------:|--------:|---------:|-----:|------------:|------------:|
-| NB, bioChemists   | 2.1e-08 | 9.8e-10 | 6.7e-08 |  4.5e-13 |    4 |       0.015 |       0.018 |
-| NB, NMES1988      | 4.7e-08 | 9.2e-10 | 4.3e-08 |  7.1e-11 |    3 |       0.076 |       0.064 |
-| ZINB, bioChemists | 1.5e-04 | 9.4e-05 | 1.3e-05 | -4.2e-08 |  111 |       1.076 |       0.042 |
-| ZINB, NMES1988    | 2.6e-05 | 1.7e-05 | 4.4e-06 | -1.6e-08 |   53 |       3.023 |       0.196 |
+| NB, bioChemists   | 2.1e-08 | 9.8e-10 | 6.7e-08 |  4.5e-13 |    4 |       0.010 |       0.011 |
+| NB, NMES1988      | 4.7e-08 | 9.2e-10 | 4.3e-08 |  7.1e-11 |    3 |       0.049 |       0.042 |
+| ZINB, bioChemists | 1.5e-04 | 9.4e-05 | 1.3e-05 | -4.2e-08 |  111 |       0.708 |       0.028 |
+| ZINB, NMES1988    | 2.6e-05 | 1.7e-05 | 4.4e-06 | -1.6e-08 |   53 |       1.989 |       0.127 |
 
 Table 1: Maximum absolute differences from the reference
 implementations, iterations of our algorithm (outer NB iterations or EM
@@ -225,10 +225,14 @@ $`\theta = 1.5`$, and fitted each with `zinbreg()` (script
 Table 3: Simulation results: bias, mean estimated SE versus Monte Carlo
 SD of the estimates, and coverage of 95% Wald intervals.
 
-TODO (your words): comment on the bias (is it small relative to the
-SE?), whether the mean SE matches the Monte Carlo SD (are the analytic
-SEs right?), and whether coverage is close to 0.95 given the Monte Carlo
-error $`\sqrt{0.95 \cdot 0.05 / R} \approx 0.015`$.
+Based on the results of the simulation, we can see that the bias is much
+smaller (about a less than a fifth) relative to the SE. The mean SEs are
+very close to the Monte Carlo SDs. For the coverage rate, all six values
+fall within 0.95 ± 2 × 0.015, which is roughly 0.92–0.98. So, the
+deviations are what you’d expect from just 200 replications. Thus, the
+simulation demonstrates that our function zinbreg() recovers the true
+parameters pretty closely and the analytic standard errors can be
+trusted.
 
 # 6 Data analysis: physician office visits (NMES1988)
 
@@ -292,37 +296,139 @@ intervals.
 The NB model estimates $`\hat\theta = 1.21`$ (SE 0.034), and the ZINB
 model $`\hat\theta = 1.48`$.
 
-TODO (your words; this is graded on interpretation, do not copy Appendix
-A):
+The NMES1988 dataset has a variance of 45.7, which is about eight times
+the mean, which is 5.77. Thus, we can notice that there is an
+overdispersion problem. The ZINB and NB model actually takes into
+account the overdispersion problem this dataset has, which is why both
+of them perform much better compared to the Poisson model. We can
+actually see that the Poisson model expects much less zeros, because it
+assumes equal mean and variance. The ZINB model takes into account the
+excess zero problem, which can be evidently seen in
+[Figure 1](#fig-visits). Thus, the expected zeros for the ZINB model is
+the closest to the number of zeros the data actually contains (708.9 vs
+683) Based on the [Table 4](#tbl-compare), we can see that the ZINB
+model has a lower AIC and BIC and favor the ZINB model over the NB one,
+so they are in agreement.
 
-1.  What the descriptive summary and [Table 4](#tbl-compare) say about
-    overdispersion and excess zeros (compare the expected zeros of the
-    NB model with the 683 observed).
-2.  Interpret the main IRRs in plain language (e.g. “each additional
-    chronic condition multiplies the expected number of visits by …”).
-3.  Interpret the zero-part ORs: which covariates change the odds of
-    being a person who would never visit a physician, and in which
-    direction?
-4.  Which model you prefer (AIC vs BIC, expected zeros,
-    interpretability) and why.
+Looking at [Table 5](#tbl-irr), we can see the incidence rate ratios
+with 95% Wald confidence intervals. These results describe people who do
+visit a physician, holding the other covariates fixed (count part). We
+can see that the strongest effects for increased physicians visits are
+hospital stays, health status, and chronic conditions. The weaker
+effects are insurance status, gender, and school. For the NB model,
+holding other variables fixed:
+
+- hospital: each additional hospital stay multiplies the expected number
+  of physician office visits by 1.24, or a 24% increase, with 95%
+  confidence that the factor is between 1.20 and 1.29.
+
+- healthpoor: individuals with poor health are expected to visit the
+  physician office by a factor of 1.36, or 36% more than individuals
+  with average health, with a 95% confidence that the factor is between
+  1.23 and 1.49.
+
+- healthexcellent: individuals with excellent health are expected to
+  visit the physician office by a factor of 0.71, or 29% less than
+  individuals with average health, with a 95% confidence that the factor
+  is between 0.63 and 0.80.
+
+- chronic: each additional chronic condition multiplies the expected
+  number of physician office visits by 1.19, or a 19% increase, with a
+  95% confidence that the factor is between 1.16 and 1.22.
+
+- gendermale: men are expected to visit the physician office by a factor
+  of 0.88, or 12% less compared to women, with a 95% confidence that the
+  factor is between 0.83 and 0.94.
+
+- school: each additional year of education multiplies the expected
+  number of physician office visits by 1.03, or a 3% increase, with a
+  95% confidence that the factor is between 1.02 and 1.04.
+
+- insuranceyes: individuals with private insurance are expected to visit
+  the physician office by a factor of 1.25, or 25% more than individuals
+  without private insurance, with a 95% confidence that the factor is
+  between 1.16 and 1.35.
+
+We can see that compared to the ZINB count IRR, most of the covariate
+point estimates of the IRR and the 95% CIs are very similar for all of
+the variables with all the directions of the variables being in
+agreement. But, the insurance and chronic variable have smaller point
+estimates compared to NB, because ZINB moves a part of their effect into
+the zero part.
+
+In this dataset’s context, odds ratio means the odds of someone who
+would never visit a physician’s office, which is a structural zero.
+Looking at [Table 6](#tbl-or), we can see that the odds ratios for
+chronic, gendermale, school, and insuranceyes are significant because
+they have a p-value less than 0.05 and the CI doesn’t include 1. All of
+these covariates except for gendermale have lower odds of being in the
+group with a lower number of physician office visits because the odds
+ratio is less than 1. Gendermale has an odds ratio over 1, meaning that
+it has a higher odds being in the group with a lower number of visits to
+the physician office visits compared to females.
+
+Based on the two tables, [Table 5](#tbl-irr) and [Table 6](#tbl-or), it
+is interesting to also note that for chronic and private insurance,
+among people who visit the physician’s office, each additional coniditon
+or having private insurance means more visits, and for people that don’t
+visit a physician, both make them less likely to not have ever visited
+the physician’s office. But, the opposite is true for gendermale, in
+that men are more likely to have never visited the physician’s office
+compared to females. However, among those who visit the physicians
+office, men are less likely to make fewer visits than women.
+
+Overall, I would prefer the ZINB model because it has the lowest AIC and
+BIC compared to the Poisson and NB models and it fits the zeros the
+best. ZINB model is also able to handle both pieces of information -
+whether people see a physician at all and how often they go.
 
 # 7 Discussion
 
-TODO (your words): limitations and extensions. Ideas to consider: EM is
-slower than BFGS ([Table 1](#tbl-agree)) and could be accelerated
-(e.g. a final few Newton steps on the full likelihood, or SQUAREM); the
-NB standard errors treat $`\theta`$ as known, as `glm.nb()` does; only
-the count part accepts an offset; other links for the zero part,
-zero-inflated Poisson or hurdle models, and robust (sandwich) standard
-errors are natural extensions.
+The nbzinbKoo R package is able to successfully implement the negative
+binomial and zero-inflated negative binomial regression from scratch.
+Comparing NB to `glm.nb()`, the differences are about $`10^{-8}`$ or
+smaller, well inside the $`10^{-5}`$ requirement. Comparing ZINB to
+`zeroinfl()`, the largest coefficient difference is
+$`1.5 \times 10^{-4}`$ on bioChemists, well inside the $`10^{-3}`$
+requirement. Across 200 simulated datasets, parameter estimates show
+small biases, with the largest absolute bias approximately 0.05 for the
+zero-part intercept. Mean estimated standard errors are close to the
+Monte Carlo standard deviations, and empirical coverage of the 95%
+confidence intervals ranges from 0.930 to 0.965. These findings support
+the implementation’s accuracy under the conditions examined.
+
+There are several limitations to address for this package. First, using
+the EM algorithm slows down the calculation time compared to the pscl
+package’s `zeroinfl()`. For example, in ZINB on bioChemists, the
+nbzinbKoo package takes 0.71 seconds vs. 0.03 seconds for `zeroinfl()`.
+Additionally, for the NMES1988 dataset, it takes 1.99 seconds vs. 0.13
+seconds for `zeroinfl()` ([Table 1](#tbl-agree)). Each maximization step
+itself is an iterative procedure, and EM converges linearly, which is
+why it takes longer. One possible extension is to use EM for the initial
+iterations and then switch to Newton–Raphson updates on the full
+observed-data log-likelihood. In addition, convergence does not
+guarantee that the global maximum has been found. Comparing fits from
+multiple starting values would provide a stronger assessment of
+optimization reliability.
+
+Another limitation is that the simulation scope is limited to one
+design: $`n = 500`$, one set of true values, and $`\theta = 1.5`$. Cases
+such as small n, very large $`\theta`$ (close to Poisson) and heavy zero
+inflation were not tested. Future simulations could vary these
+conditions to assess estimation accuracy, interval coverage, and
+convergence more broadly.
+
+Finally, the package provides model-based standard errors but does not
+implement robust sandwich standard errors. Its uncertainty estimates
+therefore depend on the assumed model being appropriate. Adding robust
+covariance estimation would help address some forms of model
+misspecification, although it would not correct misspecification of the
+conditional mean.
 
 # 8 AI-use statement
 
-TODO (your words): describe how you used Claude Code (what you asked it
-to do), what you verified yourself (e.g. comparing the IRLS weights,
-$`\tau_i`$ and the $`\theta`$ score with Section 3, running the tests,
-the prohibited-function grep), and one concrete example of output you
-corrected or rejected.
+AI Statement is included in a separate pdf file in the Canvas
+submission.
 
 # 9 References
 

@@ -168,9 +168,9 @@ higher maximum.
 | Fit               |    Coef |      SE |   theta |   logLik | Iter | Time (ours) | Time (ref.) |
 |:------------------|--------:|--------:|--------:|---------:|-----:|------------:|------------:|
 | NB, bioChemists   | 2.1e-08 | 9.8e-10 | 6.7e-08 |  4.5e-13 |    4 |       0.010 |       0.011 |
-| NB, NMES1988      | 4.7e-08 | 9.2e-10 | 4.3e-08 |  7.1e-11 |    3 |       0.049 |       0.042 |
-| ZINB, bioChemists | 1.5e-04 | 9.4e-05 | 1.3e-05 | -4.2e-08 |  111 |       0.708 |       0.028 |
-| ZINB, NMES1988    | 2.6e-05 | 1.7e-05 | 4.4e-06 | -1.6e-08 |   53 |       1.989 |       0.127 |
+| NB, NMES1988      | 4.7e-08 | 9.2e-10 | 4.3e-08 |  7.1e-11 |    3 |       0.049 |       0.041 |
+| ZINB, bioChemists | 1.5e-04 | 9.4e-05 | 1.3e-05 | -4.2e-08 |  111 |       0.724 |       0.028 |
+| ZINB, NMES1988    | 2.6e-05 | 1.7e-05 | 4.4e-06 | -1.6e-08 |   53 |       1.974 |       0.127 |
 
 Table 1: Maximum absolute differences from the reference
 implementations, iterations of our algorithm (outer NB iterations or EM
@@ -226,7 +226,7 @@ Table 3: Simulation results: bias, mean estimated SE versus Monte Carlo
 SD of the estimates, and coverage of 95% Wald intervals.
 
 Based on the results of the simulation, we can see that the bias is much
-smaller (about a less than a fifth) relative to the SE. The mean SEs are
+smaller (less than about a fifth) relative to the SE. The mean SEs are
 very close to the Monte Carlo SDs. For the coverage rate, all six values
 fall within 0.95 ± 2 × 0.015, which is roughly 0.92–0.98. So, the
 deviations are what you’d expect from just 200 replications. Thus, the
@@ -298,25 +298,26 @@ model $`\hat\theta = 1.48`$.
 
 The NMES1988 dataset has a variance of 45.7, which is about eight times
 the mean, which is 5.77. Thus, we can notice that there is an
-overdispersion problem. The ZINB and NB model actually takes into
+overdispersion problem. The ZINB and NB models actually take into
 account the overdispersion problem this dataset has, which is why both
 of them perform much better compared to the Poisson model. We can
-actually see that the Poisson model expects much less zeros, because it
+actually see that the Poisson model expects far fewer zeros, because it
 assumes equal mean and variance. The ZINB model takes into account the
 excess zero problem, which can be evidently seen in
 [Figure 1](#fig-visits). Thus, the expected zeros for the ZINB model is
 the closest to the number of zeros the data actually contains (708.9 vs
-683) Based on the [Table 4](#tbl-compare), we can see that the ZINB
-model has a lower AIC and BIC and favor the ZINB model over the NB one,
-so they are in agreement.
+683). Based on [Table 4](#tbl-compare), we can see that the ZINB model
+has a lower AIC and BIC; both criteria favor the ZINB model over the NB
+one, so they are in agreement.
 
 Looking at [Table 5](#tbl-irr), we can see the incidence rate ratios
-with 95% Wald confidence intervals. These results describe people who do
-visit a physician, holding the other covariates fixed (count part). We
-can see that the strongest effects for increased physicians visits are
-hospital stays, health status, and chronic conditions. The weaker
-effects are insurance status, gender, and school. For the NB model,
-holding other variables fixed:
+with 95% Wald confidence intervals. The NB IRRs describe the expected
+number of visits for everyone, while the ZINB count IRRs describe people
+who are “at risk” of visiting a physician (not structural zeros),
+holding the other covariates fixed. We can see that the strongest
+effects for increased physician visits are hospital stays, health
+status, and chronic conditions. The weaker effects are insurance status,
+gender, and school. For the NB model, holding other variables fixed:
 
 - hospital: each additional hospital stay multiplies the expected number
   of physician office visits by 1.24, or a 24% increase, with 95%
@@ -361,21 +362,22 @@ would never visit a physician’s office, which is a structural zero.
 Looking at [Table 6](#tbl-or), we can see that the odds ratios for
 chronic, gendermale, school, and insuranceyes are significant because
 they have a p-value less than 0.05 and the CI doesn’t include 1. All of
-these covariates except for gendermale have lower odds of being in the
-group with a lower number of physician office visits because the odds
-ratio is less than 1. Gendermale has an odds ratio over 1, meaning that
-it has a higher odds being in the group with a lower number of visits to
-the physician office visits compared to females.
+these covariates except for gendermale have lower odds of being a
+structural zero (in the group that would never visit a physician’s
+office) because the odds ratio is less than 1. Gendermale has an odds
+ratio over 1, meaning that men have higher odds of being a structural
+zero (in the group that would never visit a physician’s office) compared
+to females.
 
 Based on the two tables, [Table 5](#tbl-irr) and [Table 6](#tbl-or), it
 is interesting to also note that for chronic and private insurance,
-among people who visit the physician’s office, each additional coniditon
-or having private insurance means more visits, and for people that don’t
-visit a physician, both make them less likely to not have ever visited
-the physician’s office. But, the opposite is true for gendermale, in
-that men are more likely to have never visited the physician’s office
-compared to females. However, among those who visit the physicians
-office, men are less likely to make fewer visits than women.
+among people who visit the physician’s office, each additional condition
+or having private insurance means more visits, and in the zero part,
+both lower the odds of never visiting the physician’s office. But, the
+opposite is true for gendermale, in that men are more likely to have
+never visited the physician’s office compared to females. However, among
+those who visit the physician’s office, men are more likely to make
+fewer visits than women.
 
 Overall, I would prefer the ZINB model because it has the lowest AIC and
 BIC compared to the Poisson and NB models and it fits the zeros the
@@ -400,8 +402,8 @@ the implementation’s accuracy under the conditions examined.
 There are several limitations to address for this package. First, using
 the EM algorithm slows down the calculation time compared to the pscl
 package’s `zeroinfl()`. For example, in ZINB on bioChemists, the
-nbzinbKoo package takes 0.71 seconds vs. 0.03 seconds for `zeroinfl()`.
-Additionally, for the NMES1988 dataset, it takes 1.99 seconds vs. 0.13
+nbzinbKoo package takes 0.72 seconds vs. 0.03 seconds for `zeroinfl()`.
+Additionally, for the NMES1988 dataset, it takes 1.97 seconds vs. 0.13
 seconds for `zeroinfl()` ([Table 1](#tbl-agree)). Each maximization step
 itself is an iterative procedure, and EM converges linearly, which is
 why it takes longer. One possible extension is to use EM for the initial
